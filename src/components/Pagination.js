@@ -54,7 +54,9 @@ export function Pagination() {
           {activePage + 1 !== pages.length - 1 && (
             <>
               <Ellipsis>...</Ellipsis>
-              <Page onClick={() => pageClickHandler(pages.length)}>Last »</Page>
+              <Page onClick={() => pageClickHandler(pages.length - 1)}>
+                Last »
+              </Page>
             </>
           )}
         </>
@@ -81,13 +83,13 @@ const Page = styled.span`
   }
 `;
 
-const Container = styled.div`
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  justify-items: center;
-  gap: 30px;
-`;
+// const Container = styled.div`
+//   width: 100%;
+//   display: grid;
+//   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+//   justify-items: center;
+//   gap: 30px;
+// `;
 
 const Ellipsis = styled(Page)`
   cursor: default;

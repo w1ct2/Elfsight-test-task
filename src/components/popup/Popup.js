@@ -28,7 +28,7 @@ export function Popup({ settings: { visible, content = {} }, setSettings }) {
   }
 
   return (
-    <PopupContainer visible={visible}>
+    <PopupContainer visible={visible} onClick={togglePopup}>
       <StyledPopup>
         <CloseIcon onClick={togglePopup} />
 
