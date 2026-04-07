@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import { PopupEpisodes } from './PopupEpisodes';
 import { PopupHeader } from './PopupHeader';
@@ -16,21 +17,36 @@ export function Popup({ settings: { visible, content = {} }, setSettings }) {
     episode: episodes
   } = content;
 
-  function togglePopup(e) {
-    if (e.currentTarget !== e.target) {
-      return;
-    }
-
+  const closePopup = useCallback(() => {
     setSettings((prevState) => ({
       ...prevState,
-      visible: !prevState.visible
+      visible: false
     }));
-  }
+  }, [setSettings]);
+
+  const handleOverlayClick = useCallback(
+    (e) => {
+      if (e.currentTarget !== e.target) {
+        return;
+      }
+
+      closePopup();
+    },
+    [closePopup]
+  );
+
+  const handleCloseIcon = useCallback(
+    (e) => {
+      e.stopPropagation();
+      closePopup();
+    },
+    [closePopup]
+  );
 
   return (
-    <PopupContainer visible={visible} onClick={togglePopup}>
+    <PopupContainer visible={visible} onClick={handleOverlayClick}>
       <StyledPopup>
-        <CloseIcon onClick={togglePopup} />
+        <CloseIcon onClick={handleCloseIcon} />
 
         <PopupHeader
           name={name}

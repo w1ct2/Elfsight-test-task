@@ -1,16 +1,33 @@
 import styled from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useData } from './providers';
 
 export function Pagination() {
   const [pages, setPages] = useState([]);
   const { apiURL, info, activePage, setActivePage, setApiURL } = useData();
 
-  const pageClickHandler = (index) => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setActivePage(index);
-    setApiURL(pages[index]);
-  };
+  const goToPage = useCallback(
+    (index) => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setActivePage(index);
+      setApiURL(pages[index]);
+    },
+    [pages, setActivePage, setApiURL]
+  );
+
+  const goToFirstPage = useCallback(() => goToPage(0), [goToPage]);
+  const goToPreviousPage = useCallback(() => goToPage(activePage - 1), [
+    goToPage,
+    activePage
+  ]);
+  const goToNextPage = useCallback(() => goToPage(activePage + 1), [
+    goToPage,
+    activePage
+  ]);
+  const goToLastPage = useCallback(() => goToPage(pages.length - 1), [
+    goToPage,
+    pages.length
+  ]);
 
   useEffect(() => {
     const createdPages = Array.from({ length: info.pages }, (_, i) => {
@@ -32,14 +49,12 @@ export function Pagination() {
         <>
           {activePage - 1 !== 0 && (
             <>
-              <Page onClick={() => pageClickHandler(0)}>« First</Page>
+              <Page onClick={goToFirstPage}>« First</Page>
               <Ellipsis>...</Ellipsis>
             </>
           )}
 
-          <Page onClick={() => pageClickHandler(activePage - 1)}>
-            {activePage}
-          </Page>
+          <Page onClick={goToPreviousPage}>{activePage}</Page>
         </>
       )}
 
@@ -47,16 +62,12 @@ export function Pagination() {
 
       {pages[activePage + 1] && (
         <>
-          <Page onClick={() => pageClickHandler(activePage + 1)}>
-            {activePage + 2}
-          </Page>
+          <Page onClick={goToNextPage}>{activePage + 2}</Page>
 
           {activePage + 1 !== pages.length - 1 && (
             <>
               <Ellipsis>...</Ellipsis>
-              <Page onClick={() => pageClickHandler(pages.length - 1)}>
-                Last »
-              </Page>
+              <Page onClick={goToLastPage}>Last »</Page>
             </>
           )}
         </>
