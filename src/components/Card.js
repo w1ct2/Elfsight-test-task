@@ -1,9 +1,9 @@
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { ReactComponent as Male } from '../assets/genders/male.svg';
 import { ReactComponent as Female } from '../assets/genders/female.svg';
 import { ReactComponent as Genderless } from '../assets/genders/genderless.svg';
 
-// TODO: Refactor the Card component
 export function Card({
   status,
   name,
@@ -11,10 +11,17 @@ export function Card({
   type,
   gender,
   image,
-  onClickHandler
+  onClickHandler,
+  payload
 }) {
+  const handleClick = useCallback(() => {
+    if (onClickHandler) {
+      onClickHandler(payload);
+    }
+  }, [onClickHandler, payload]);
+
   return (
-    <StyledCard onClick={onClickHandler}>
+    <StyledCard onClick={handleClick}>
       <CardImg src={image} alt={name} />
 
       <CardInfo>

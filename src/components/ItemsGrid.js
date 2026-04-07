@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { Popup } from './popup';
 import { useData } from './providers';
@@ -12,13 +12,12 @@ const defaultPopupSettings = {
 export function ItemsGrid() {
   const { characters } = useData();
   const [popupSettings, setPopupSettings] = useState(defaultPopupSettings);
-
-  function cardOnClickHandler(props) {
+  const openPopup = useCallback((content) => {
     setPopupSettings({
       visible: true,
-      content: { ...props }
+      content: { ...content }
     });
-  }
+  }, []);
 
   if (!characters.length) {
     return null;
@@ -26,10 +25,11 @@ export function ItemsGrid() {
 
   return (
     <Container>
-      {characters.map((props, index) => (
+      {characters.map((props) => (
         <Card
-          key={index}
-          onClickHandler={() => cardOnClickHandler(props)}
+          key={props.id}
+          onClickHandler={openPopup}
+          payload={props}
           {...props}
         />
       ))}
