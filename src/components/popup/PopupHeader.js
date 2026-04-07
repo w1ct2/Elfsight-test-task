@@ -5,7 +5,9 @@ export function PopupHeader({ image, name, gender, status, species, type }) {
   return (
     <PopupHeaderContainer>
       <PopupImage src={image?.replace('../', '')} alt={name} />
-      <PopupTitle name={name} gender={gender} />
+      <PopupTitleWrapper>
+        <CardTitle name={name} gender={gender} />
+      </PopupTitleWrapper>
       <PopupStatus status={status} species={species} type={type} />
     </PopupHeaderContainer>
   );
@@ -13,10 +15,14 @@ export function PopupHeader({ image, name, gender, status, species, type }) {
 
 const PopupHeaderContainer = styled.div``;
 
-const PopupTitle = styled(CardTitle)`
-  font-size: 22px;
-  margin-top: 30px;
+const PopupTitleWrapper = styled.div`
+  display: flex;
   justify-content: center;
+  margin-top: 30px;
+
+  .card-title {
+    font-size: 22px;
+  }
 `;
 
 const PopupStatus = styled(CardStatus)`

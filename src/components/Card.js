@@ -143,6 +143,7 @@ const CardTitleContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 10px;
+  gap: 8px;
 `;
 
 const StyledCardTitle = styled.h2`
