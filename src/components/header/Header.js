@@ -1,55 +1,106 @@
+import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { Logo } from './Logo';
 import { AppInput } from '../ui/AppInput';
 import { HeaderAction } from './HeaderAction';
 import { AppSelect } from '../ui/AppSelect';
 import { AppButton } from '../ui/AppButton';
+import { useData } from '../providers';
+import { GENDER_OPTIONS, STATUS_OPTIONS } from '../../utils/characterFilters';
 
 export function Header() {
+  const {
+    draft,
+    setDraft,
+    applyFilters,
+    resetFilters,
+    speciesOptions
+  } = useData();
+
+  const speciesSelectOptions = useMemo(() => {
+    if (!draft.species) {
+      return speciesOptions;
+    }
+
+    if (speciesOptions.some((o) => o.value === draft.species)) {
+      return speciesOptions;
+    }
+
+    return [...speciesOptions, { value: draft.species, label: draft.species }];
+  }, [speciesOptions, draft.species]);
+
+  const onStatusChange = useCallback(
+    (opt) => {
+      setDraft((d) => ({ ...d, status: opt?.value ?? '' }));
+    },
+    [setDraft]
+  );
+
+  const onGenderChange = useCallback(
+    (opt) => {
+      setDraft((d) => ({ ...d, gender: opt?.value ?? '' }));
+    },
+    [setDraft]
+  );
+
+  const onSpeciesChange = useCallback(
+    (opt) => {
+      setDraft((d) => ({ ...d, species: opt?.value ?? '' }));
+    },
+    [setDraft]
+  );
+
+  const onNameChange = useCallback(
+    (e) => {
+      setDraft((d) => ({ ...d, name: e.target.value }));
+    },
+    [setDraft]
+  );
+
+  const onTypeChange = useCallback(
+    (e) => {
+      setDraft((d) => ({ ...d, type: e.target.value }));
+    },
+    [setDraft]
+  );
+
   return (
     <HeaderContainer>
       <Logo />
       <HeaderAction>
         <AppSelect
-          options={[
-            { value: 'Alive', label: 'Alive' },
-            { value: 'Dead', label: 'Dead' },
-            { value: 'Unknown', label: 'Unknown' }
-          ]}
+          options={STATUS_OPTIONS}
+          value={draft.status}
+          onChange={onStatusChange}
           placeholder="Status"
         />
         <AppSelect
-          options={[
-            { value: 'Male', label: 'Male' },
-            { value: 'Female', label: 'Female' },
-            { value: 'Genderless', label: 'Genderless' },
-            { value: 'Unknown', label: 'Unknown' }
-          ]}
+          options={GENDER_OPTIONS}
+          value={draft.gender}
+          onChange={onGenderChange}
           placeholder="Gender"
         />
         <AppSelect
-          options={[
-            { value: 'Human', label: 'Human' },
-            { value: 'Alien', label: 'Alien' },
-            { value: 'Humanoid', label: 'Humanoid' },
-            { value: 'Poopybutthole', label: 'Poopybutthole' },
-            { value: 'Mythological', label: 'Mythological' },
-            { value: 'Unknown', label: 'Unknown' },
-            { value: 'Animal', label: 'Animal' },
-            { value: 'Disease', label: 'Disease' },
-            { value: 'Robot', label: 'Robot' },
-            { value: 'Cronenberg', label: 'Cronenberg' },
-            { value: 'Planet', label: 'Planet' }
-          ]}
+          options={speciesSelectOptions}
+          value={draft.species}
+          onChange={onSpeciesChange}
           placeholder="Species"
         />
-        <AppInput placeholder="Name" />
-        <AppInput placeholder="Type" />
+        <AppInput
+          placeholder="Name"
+          value={draft.name}
+          onChange={onNameChange}
+        />
+        <AppInput
+          placeholder="Type"
+          value={draft.type}
+          onChange={onTypeChange}
+        />
         <HeaderButtons>
-          <AppButton>
+          <AppButton type="button" onClick={applyFilters}>
             <span>Apply</span>
           </AppButton>
-          <AppButton>
+          <AppButton type="button" onClick={resetFilters}>
             <span>Reset</span>
           </AppButton>
         </HeaderButtons>

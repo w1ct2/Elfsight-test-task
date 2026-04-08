@@ -83,13 +83,17 @@ const ToggleIcon = styled(IconBox)`
 `;
 
 const ClearIconButton = styled(IconBox)`
+  flex-shrink: 0;
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 4px;
   transition: background 0.2s ease, color 0.2s ease;
   color: ${TEXT_COLOR};
 
   &:hover {
-    background: rgba(131, 191, 70, 0.18);
     color: ${BORDER_COLOR};
   }
 `;
@@ -182,25 +186,51 @@ const StyledArrowIcon = styled(ArrowIcon)`
 const CrossIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 14 14"
+    viewBox="0 0 16 16"
+    width="16"
+    height="16"
     aria-hidden="true"
   >
     <path
-      d="M4 4l6 6"
+      d="M4 4l8 8"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="2"
       strokeLinecap="round"
     />
     <path
-      d="M10 4l-6 6"
+      d="M12 4l-8 8"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="2"
       strokeLinecap="round"
     />
   </svg>
 );
+
+function findSelectedOption(options, currentValue) {
+  if (currentValue === '' || currentValue == null) {
+    return null;
+  }
+
+  const exact = options.find((o) => o.value === currentValue);
+
+  if (exact) {
+    return exact;
+  }
+
+  if (typeof currentValue !== 'string') {
+    return null;
+  }
+
+  const lower = currentValue.toLowerCase();
+
+  return (
+    options.find(
+      (o) => typeof o.value === 'string' && o.value.toLowerCase() === lower
+    ) ?? null
+  );
+}
 
 export const AppSelect = forwardRef(
   (
@@ -216,6 +246,18 @@ export const AppSelect = forwardRef(
     ref
   ) => {
     const containerRef = useRef(null);
+    const setRootRef = useCallback(
+      (node) => {
+        containerRef.current = node;
+
+        if (typeof ref === 'function') {
+          ref(node);
+        } else if (ref != null) {
+          ref.current = node;
+        }
+      },
+      [ref]
+    );
     const listId = useId();
     const isControlled = value !== undefined;
     const [uncontrolledValue, setUncontrolledValue] = useState(
@@ -226,13 +268,19 @@ export const AppSelect = forwardRef(
 
     const currentValue = isControlled ? value ?? '' : uncontrolledValue;
 
-    const selectedOption = useMemo(() => {
-      return options.find((option) => option.value === currentValue) ?? null;
-    }, [options, currentValue]);
+    const selectedOption = useMemo(
+      () => findSelectedOption(options, currentValue),
+      [options, currentValue]
+    );
 
-    const displayText = selectedOption ? selectedOption.label : placeholder;
-    const isPlaceholder = !selectedOption;
-    const hasValue = Boolean(selectedOption);
+    const trimmedValue = String(currentValue ?? '').trim();
+    const displayText = selectedOption
+      ? selectedOption.label
+      : trimmedValue !== ''
+      ? String(currentValue)
+      : placeholder;
+    const isPlaceholder = !selectedOption && trimmedValue === '';
+    const hasValue = Boolean(selectedOption) || trimmedValue !== '';
 
     useEffect(() => {
       const handleClickOutside = (event) => {
@@ -330,9 +378,8 @@ export const AppSelect = forwardRef(
     }, []);
 
     return (
-      <Root ref={ref} className={className} {...rest}>
+      <Root ref={setRootRef} className={className} {...rest}>
         <Control
-          ref={containerRef}
           type="button"
           onClick={handleToggle}
           onKeyDown={handleKeyDown}
