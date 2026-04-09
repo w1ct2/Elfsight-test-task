@@ -17,6 +17,8 @@ npm start
 npm run lint
 ```
 
+Деплой проекта: https://elfsight-test-task-sable.vercel.app
+
 ## По тз:
 
 Исправить
